@@ -64,7 +64,8 @@ class CardList extends StatelessWidget {
               title,
               textAlign: TextAlign.left,
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

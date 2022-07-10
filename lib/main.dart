@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/rendering.dart';
 
 import 'package:celebstar/appBar.dart';
-import 'package:celebstar/card.dart';
+import 'package:celebstar/home.dart';
+import 'package:celebstar/explore.dart';
+import 'package:celebstar/profile.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,66 +17,39 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  var _currentIndex = 0;
+  var pages = [
+    HomePage(),
+    ExplorePage(),
+    ProfilePage(),
+  ];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/background.png"),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Column(
-              children: <Widget>[
-                CardList(
-                  "Most Viewed",
-                  [
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                  ],
-                ),
-                CardList(
-                  "Hollywood",
-                  [
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                  ],
-                ),
-                CardList(
-                  "Bollywood",
-                  [
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                  ],
-                ),
-                CardList(
-                  "Tollywood",
-                  [
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                  ],
-                ),
-                CardList(
-                  "Jollywood",
-                  [
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                    ElevatedCard("Alec Benjiman"),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+        body: pages[_currentIndex],
         appBar: const AppBarWidget(),
         drawer: const NavDrawer(),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() {
+            _currentIndex = index;
+          }),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
       theme: ThemeData.dark(),
     );
