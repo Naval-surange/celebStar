@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:celebstar/providers/PageIndex.dart';
+import 'package:celebstar/providers/GoogleSignin.dart';
 
 class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   const AppBarWidget({
@@ -65,7 +69,15 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Logout'),
-            onTap: () => {Navigator.of(context).pop()},
+            onTap: () => {
+              Provider.of<GoogleSigninProvider>(context, listen: false)
+                  .logout()
+                  .then((_) {
+                Navigator.of(context).pop();
+                Provider.of<PageIndexProvider>(context, listen: false)
+                    .setIndex(0);
+              })
+            },
           ),
         ],
       ),
@@ -79,26 +91,49 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  var _currentIndex = 0;
+  var _currentindex = 0;
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      onTap: (index) => setState(() {
-        _currentIndex = index;
-      }),
-      items: const [
-        BottomNavigationBarItem(
+      currentIndex: _currentindex,
+      onTap: (index) => setState(
+        () {
+          context.read<PageIndexProvider>().setIndex(index);
+          _currentindex = index;
+        },
+      ),
+      items: [
+        const BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
         ),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
           icon: Icon(Icons.search),
           label: 'Explore',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
+          icon: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: NetworkImage(
+                  context.watch<GoogleSigninProvider>().user.photoUrl,
+                ),
+              ),
+            ),
+            // child: Image.network(
+            //   context.watch<GoogleSigninProvider>().user.photoUrl,
+            //   width: 24,
+            //   height: 24,
+            // ),
+          ),
+          // icon: ImageIcon(
+          //   NetworkImage(context.watch<GoogleSigninProvider>().user.photoUrl),
+          // ),
           label: 'Profile',
         ),
       ],

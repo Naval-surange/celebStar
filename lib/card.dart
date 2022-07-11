@@ -59,7 +59,8 @@ class CardList extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.only(top: 20),
+            margin: const EdgeInsets.only(top: 20, left: 20),
+            width: double.infinity,
             child: Text(
               title,
               textAlign: TextAlign.left,

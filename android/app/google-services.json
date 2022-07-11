@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "658322889335",
+    "project_id": "celebstar-4acf8",
+    "storage_bucket": "celebstar-4acf8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:658322889335:android:80d976608c0c26c96bc472",
+        "android_client_info": {
+          "package_name": "com.example.celebstar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "658322889335-9e6jm2av6f5nfvlqjkoonv31pvgujs5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh3sUaFxeMBdARClVueQUu9Q9LZxuadno"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "658322889335-9e6jm2av6f5nfvlqjkoonv31pvgujs5h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

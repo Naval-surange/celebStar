@@ -1,23 +1,40 @@
+// libraries
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
+//pages
+import 'package:celebstar/Login.dart';
 import 'package:celebstar/appBar.dart';
 import 'package:celebstar/home.dart';
 import 'package:celebstar/explore.dart';
 import 'package:celebstar/profile.dart';
 
-void main() {
-  runApp(MyApp());
+//providers
+import 'package:celebstar/providers/PageIndex.dart';
+import 'package:celebstar/providers/GoogleSignin.dart';
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => PageIndexProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GoogleSigninProvider(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  var _currentIndex = 0;
+class MyApp extends StatelessWidget {
   var pages = [
     HomePage(),
     ExplorePage(),
@@ -25,33 +42,29 @@ class _MyAppState extends State<MyApp> {
   ];
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: pages[_currentIndex],
-        appBar: const AppBarWidget(),
-        drawer: const NavDrawer(),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => setState(() {
-            _currentIndex = index;
-          }),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'Explore',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
+    var currentIndex = context.watch<PageIndexProvider>().index;
+    var user = context.watch<GoogleSigninProvider>().user;
+    if (user == null) {
+      return MaterialApp(
+        title: 'Celebstar',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-      ),
-      theme: ThemeData.dark(),
-    );
+        home: const Scaffold(
+          body: Login(),
+        ),
+      );
+    } else {
+      return MaterialApp(
+        home: Scaffold(
+          body: pages[currentIndex],
+          appBar: const AppBarWidget(),
+          drawer: const NavDrawer(),
+          bottomNavigationBar: BottomNavBar(),
+        ),
+        theme: ThemeData.dark(),
+      );
+    }
   }
 }
