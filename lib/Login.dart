@@ -21,7 +21,7 @@ class Login extends StatelessWidget {
         children: <Widget>[
           const Spacer(),
           Image.asset(
-            "assets/images/placeholder.jpeg",
+            "assets/images/banner.png",
             width: 200,
           ),
           const SizedBox(
@@ -67,7 +67,7 @@ class Login extends StatelessWidget {
             },
             icon: const FaIcon(
               FontAwesomeIcons.google,
-              color: Colors.red,
+              color: Color.fromARGB(255, 192, 173, 0),
             ),
             label: const Text("SignUp using Google"),
           ),

@@ -35,15 +35,17 @@ Future main() async {
 }
 
 class MyApp extends StatelessWidget {
-  var pages = [
-    HomePage(),
-    ExplorePage(),
-    ProfilePage(),
-  ];
   @override
   Widget build(BuildContext context) {
     var currentIndex = context.watch<PageIndexProvider>().index;
     var user = context.watch<GoogleSigninProvider>().user;
+    // print user name
+    // print(user.displayName);
+    var pages = [
+      HomePage(),
+      ExplorePage(),
+      ProfilePage(user),
+    ];
     if (user == null) {
       return MaterialApp(
         title: 'Celebstar',
@@ -60,7 +62,7 @@ class MyApp extends StatelessWidget {
         home: Scaffold(
           body: pages[currentIndex],
           appBar: const AppBarWidget(),
-          drawer: const NavDrawer(),
+          // drawer: const NavDrawer(),
           bottomNavigationBar: BottomNavBar(),
         ),
         theme: ThemeData.dark(),

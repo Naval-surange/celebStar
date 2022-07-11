@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:celebstar/providers/PageIndex.dart';
 import 'package:celebstar/providers/GoogleSignin.dart';
@@ -16,7 +17,11 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 10,
-      title: const Text("CelebStar"),
+      title: Text(
+        "CelebStar",
+        style: GoogleFonts.kaushanScript(
+            fontSize: 25, fontWeight: FontWeight.bold),
+      ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           bottom: Radius.circular(40),
