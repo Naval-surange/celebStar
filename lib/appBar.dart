@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -91,6 +92,7 @@ class NavDrawer extends StatelessWidget {
 }
 
 class BottomNavBar extends StatefulWidget {
+  const BottomNavBar({Key? key}) : super(key: key);
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
 }
@@ -126,19 +128,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
               image: DecorationImage(
                 fit: BoxFit.cover,
                 image: NetworkImage(
-                  context.watch<GoogleSigninProvider>().user.photoUrl,
+                  FirebaseAuth.instance.currentUser?.photoURL ??
+                      'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
+                  // context.watch<GoogleSigninProvider>().user.photoUrl,
                 ),
               ),
             ),
-            // child: Image.network(
-            //   context.watch<GoogleSigninProvider>().user.photoUrl,
-            //   width: 24,
-            //   height: 24,
-            // ),
           ),
-          // icon: ImageIcon(
-          //   NetworkImage(context.watch<GoogleSigninProvider>().user.photoUrl),
-          // ),
           label: 'Profile',
         ),
       ],

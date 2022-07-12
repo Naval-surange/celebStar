@@ -1,4 +1,5 @@
 // libraries
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -28,45 +29,67 @@ Future main() async {
           create: (_) => GoogleSigninProvider(),
         ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    var currentIndex = context.watch<PageIndexProvider>().index;
-    var user = context.watch<GoogleSigninProvider>().user;
-    // print user name
-    // print(user.displayName);
-    var pages = [
-      HomePage(),
-      ExplorePage(),
-      ProfilePage(user),
-    ];
-    if (user == null) {
-      return MaterialApp(
-        title: 'Celebstar',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const Scaffold(
-          body: Login(),
-        ),
-      );
-    } else {
-      return MaterialApp(
-        home: Scaffold(
-          body: pages[currentIndex],
-          appBar: const AppBarWidget(),
-          // drawer: const NavDrawer(),
-          bottomNavigationBar: BottomNavBar(),
-        ),
-        theme: ThemeData.dark(),
-      );
-    }
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (Provider.of<GoogleSigninProvider>(context).user == null) {
+          // remove after deployment
+          return MaterialApp(
+            title: 'Celebstar',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            home: const Scaffold(
+              body: Login(),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          var pages = [
+            HomePage(),
+            ExplorePage(),
+            ProfilePage(),
+          ];
+          return MaterialApp(
+            home: GestureDetector(
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              child: Scaffold(
+                body: pages[context.watch<PageIndexProvider>().index],
+                appBar: const AppBarWidget(),
+                // drawer: const NavDrawer(),
+                bottomNavigationBar: const BottomNavBar(),
+              ),
+            ),
+            theme: ThemeData.dark(),
+          );
+        } else if (snapshot.hasError) {
+          return const Center(child: Text("something went wrong"));
+        } else {
+          return MaterialApp(
+            title: 'Celebstar',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            home: const Scaffold(
+              body: Login(),
+            ),
+          );
+        }
+      },
+    );
   }
 }

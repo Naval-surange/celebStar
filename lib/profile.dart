@@ -1,17 +1,36 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:celebstar/providers/PageIndex.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/GoogleSignin.dart';
 
-class ProfilePage extends StatelessWidget {
-  final userData;
+class ProfilePage extends StatefulWidget {
+  var userData;
+
+  ProfilePage();
+  ProfilePage.fromUser(this.userData);
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  var userData;
+
   final double coverHeight = 240;
   final double profileHeight = 144;
-  ProfilePage(this.userData);
+
+  String about =
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe";
+
   @override
   Widget build(BuildContext context) {
+    userData = widget.userData;
+    userData ??= FirebaseAuth.instance.currentUser;
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -60,26 +79,35 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(left: 20),
-            child: const Text(
-              "About",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 20),
+                child: const Text(
+                  "About",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
               ),
-              textAlign: TextAlign.left,
-            ),
+              IconButton(
+                onPressed: () {
+                  openDialog(context);
+                },
+                icon: Icon(Icons.edit),
+              ),
+            ],
           ),
           const SizedBox(
-            height: 10,
+            height: 4,
           ),
           Container(
             padding: const EdgeInsets.all(20),
-            child: const Text(
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe",
-              style: TextStyle(
+            child: Text(
+              about,
+              style: const TextStyle(
                 fontSize: 18,
               ),
               textAlign: TextAlign.left,
@@ -108,6 +136,40 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(
             height: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future openDialog(context) {
+    var ctr = TextEditingController(text: about);
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Edit About"),
+        content: TextField(
+          controller: ctr,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          decoration: InputDecoration(
+            hintText: "Enter your About",
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("Cancle"),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                about = ctr.text;
+              });
+            },
+            child: Text("Update"),
           ),
         ],
       ),
@@ -145,7 +207,7 @@ class ProfilePage extends StatelessWidget {
     return CircleAvatar(
       radius: profileHeight / 2,
       backgroundColor: Colors.grey.shade800,
-      backgroundImage: NetworkImage(userData.photoUrl),
+      backgroundImage: NetworkImage(userData.photoURL),
     );
   }
 
