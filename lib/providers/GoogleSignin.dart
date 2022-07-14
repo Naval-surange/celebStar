@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:celebstar/providers/User.dart';
 
 class GoogleSigninProvider extends ChangeNotifier {
   final googleSignin = GoogleSignIn();
@@ -19,6 +20,10 @@ class GoogleSigninProvider extends ChangeNotifier {
       idToken: googleAuth.idToken,
     );
     await FirebaseAuth.instance.signInWithCredential(credintial);
+
+    var user = UserClass(FirebaseAuth.instance.currentUser?.uid);
+    await user.createOnFirebase();
+
     notifyListeners();
   }
 

@@ -1,4 +1,5 @@
 // libraries
+import 'package:celebstar/providers/User.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,9 @@ Future main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => GoogleSigninProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserClass(null),
         ),
       ],
       child: const MyApp(),
@@ -61,7 +65,7 @@ class MyApp extends StatelessWidget {
           var pages = [
             HomePage(),
             ExplorePage(),
-            ProfilePage(),
+            ProfilePage(FirebaseAuth.instance.currentUser?.uid),
           ];
           return MaterialApp(
             home: GestureDetector(

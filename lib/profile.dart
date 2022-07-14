@@ -7,40 +7,52 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/GoogleSignin.dart';
+import 'package:celebstar/providers/User.dart';
 
 class ProfilePage extends StatefulWidget {
-  var userData;
+  var uid;
 
-  ProfilePage();
-  ProfilePage.fromUser(this.userData);
+  // ProfilePage();
+  ProfilePage(this.uid);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  var userData;
-
+  late String? uid;
+  late UserClass user;
   final double coverHeight = 240;
   final double profileHeight = 144;
 
-  String about =
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehe";
-
   @override
   Widget build(BuildContext context) {
-    userData = widget.userData;
-    userData ??= FirebaseAuth.instance.currentUser;
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        buildTop(),
-        buildContent(context),
-      ],
+    uid = widget.uid;
+    uid ??= FirebaseAuth.instance.currentUser?.uid;
+    user = UserClass(uid);
+
+    return StreamBuilder<UserClass>(
+      stream: user.getUserStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var userData = snapshot.data!;
+          return ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              buildTop(userData),
+              buildContent(context, userData),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Text(snapshot.error.toString());
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 
-  Widget buildContent(BuildContext context) {
+  Widget buildContent(BuildContext context, UserClass userData) {
     return Container(
       margin: EdgeInsets.only(top: profileHeight / 2 + 10),
       child: Column(
@@ -94,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               IconButton(
                 onPressed: () {
-                  openDialog(context);
+                  openDialog(context, userData);
                 },
                 icon: Icon(Icons.edit),
               ),
@@ -106,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Container(
             padding: const EdgeInsets.all(20),
             child: Text(
-              about,
+              userData.about ?? " ",
               style: const TextStyle(
                 fontSize: 18,
               ),
@@ -142,8 +154,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future openDialog(context) {
-    var ctr = TextEditingController(text: about);
+  Future openDialog(context, UserClass userData) {
+    var ctr = TextEditingController(text: userData.about);
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -164,10 +176,10 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Text("Cancle"),
           ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                about = ctr.text;
-              });
+            onPressed: () async {
+              user.about = ctr.text;
+              await user.pushToFirebase();
+              Navigator.of(context).pop();
             },
             child: Text("Update"),
           ),
@@ -188,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget buildTop() {
+  Widget buildTop(UserClass userData) {
     final double top = coverHeight - profileHeight / 2;
     return Stack(
       clipBehavior: Clip.none,
@@ -197,17 +209,17 @@ class _ProfilePageState extends State<ProfilePage> {
         buildCoverImage(),
         Positioned(
           top: top,
-          child: buildProfileImage(),
+          child: buildProfileImage(userData),
         ),
       ],
     );
   }
 
-  Widget buildProfileImage() {
+  Widget buildProfileImage(userData) {
     return CircleAvatar(
       radius: profileHeight / 2,
       backgroundColor: Colors.grey.shade800,
-      backgroundImage: NetworkImage(userData.photoURL),
+      backgroundImage: NetworkImage(userData.photoUrl),
     );
   }
 
