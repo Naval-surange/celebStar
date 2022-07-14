@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:celebstar/providers/PageIndex.dart';
 import 'package:celebstar/providers/GoogleSignin.dart';
+import 'package:celebstar/providers/User.dart';
 
 class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   const AppBarWidget({
@@ -99,9 +100,10 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   var _currentindex = 0;
-
+  final user = UserClass(FirebaseAuth.instance.currentUser?.uid);
   @override
   Widget build(BuildContext context) {
+    user.loadFromFirebase();
     return BottomNavigationBar(
       currentIndex: _currentindex,
       onTap: (index) => setState(
@@ -120,21 +122,24 @@ class _BottomNavBarState extends State<BottomNavBar> {
           label: 'Explore',
         ),
         BottomNavigationBarItem(
-          icon: Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(
-                  FirebaseAuth.instance.currentUser?.photoURL ??
-                      'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
-                  // context.watch<GoogleSigninProvider>().user.photoUrl,
-                ),
-              ),
-            ),
-          ),
+          icon: StreamBuilder<UserClass>(
+              stream: user.getUserStream(),
+              builder: (context, snapshot) {
+                return Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(
+                        user.photoUrl ??
+                            'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
+                      ),
+                    ),
+                  ),
+                );
+              }),
           label: 'Profile',
         ),
       ],

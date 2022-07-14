@@ -1,6 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:celebstar/providers/PageIndex.dart';
+import 'package:celebstar/providers/firebaseStorage.dart';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -211,7 +214,38 @@ class _ProfilePageState extends State<ProfilePage> {
           top: top,
           child: buildProfileImage(userData),
         ),
+        Positioned(
+          top: top,
+          left: MediaQuery.of(context).size.width - 150,
+          child: buildEdit(userData),
+        ),
       ],
+    );
+  }
+
+  Widget buildEdit(UserClass userData) {
+    Storage storage = Storage();
+    return IconButton(
+      onPressed: () async {
+        final results = await FilePicker.platform.pickFiles(
+          allowMultiple: false,
+          type: FileType.image,
+        );
+        if (results == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("No image picked"),
+            ),
+          );
+        }
+
+        final path = results?.files.single.path;
+        final filename = userData.uid;
+        String? url = await storage.uploadFile(path, filename);
+        user.photoUrl = url;
+        await user.pushToFirebase();
+      },
+      icon: Icon(Icons.edit),
     );
   }
 
